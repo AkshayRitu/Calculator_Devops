@@ -14,4 +14,4 @@
       shell: docker pull akshaytakrani11/calculator_devops
       
     - name: running container
-      shell: docker run -it -d akshaytakrani11/calculator_devops
+      shell: docker run -it -v ${PWD}/log:/log -d akshaytakrani11/calculator_devops
