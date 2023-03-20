@@ -1,1 +1,2 @@
-localhost ansible_user=akshay
+[clients]
+client ansible_host=localhost ansible_connection=ssh ansible_user=akshay ansible_sudo_pass=Akshay@123
