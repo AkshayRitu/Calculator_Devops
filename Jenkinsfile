@@ -1,66 +1,54 @@
 pipeline {
-    // Declare variables that will be used by the later stages
+
     environment {
-        DOCKERHUB_REGISTRY = "jasvinjames/calculator-using-devops"
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-id')
+        img=""
     }
-    
-    // The "agent" section configures on which nodes the pipeline can be 
-    // run. Specifying "agent any" means that Jenkins will run the job on  
-    // any of the available nodes.
-    agent any 
-    
-    stages {
-        
-        stage('Git Pull') {
+    agent any
+
+    stages{
+
+        stage('Github Pull') {
             steps {
-                // credentials are required because its a private repository
-                git url: 'https://github.com/james-jasvin/Calculator-Using-DevOps.git',
-                branch: 'master',
-                credentialsId: 'github-pat'
+                git 'https://github.com/AkshayRitu/Calculator_Devops.git'
             }
         }
-        
-        stage('Maven Build + JUnit Tests') {
-            steps {
+
+      stage('Maven Buid') {
+        steps {
+            script{
                 sh 'mvn clean install'
             }
         }
-        
-        stage('Build Docker Image') {
-			steps {
-				sh "docker build -t $DOCKERHUB_REGISTRY:latest ."
-			}
-		}
-
-		stage('Login to Docker Hub') {
-			steps {
-				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-			}
-		}
-
-		stage('Push Docker Image to Docker Hub') {
-			steps {
-				sh 'docker push $DOCKERHUB_REGISTRY:latest'
-			}
-		}
-        
-        stage('Removing Docker Image from Local') {
-            steps {
-                sh "docker rmi $DOCKERHUB_REGISTRY:latest"
+    }
+          stage('Create Docker image') {
+        steps {
+            script{
+                img = docker.build "akshaytakrani11/calculator_devops:latest"
             }
         }
-        
-        // Ansible Deploy to remote server (managed host)
-        stage('Ansible Deploy') {
-            steps {
-                ansiblePlaybook becomeUser: 'null',
-                colorized: true,
-                installation: 'Ansible',
-                inventory: 'inventory',
-                playbook: 'deploy-playbook.yml',
-                sudoUser: 'null'
+    }
+
+    stage('Push Docker image to DockerHub') {
+        steps {
+            script{
+                docker.withRegistry('',"dockerHub"){
+                    img.push()
+
+                }
+
             }
         }
+    }
+
+    stage('Ansible pull docker image from docker hub') {
+        steps {
+            script{
+                sh 'export LC_ALL=en_IN.UTF-8'
+            }
+            ansiblePlaybook becomeUser: null, colorized: true, disableHostKeyChecking: true, installation: 'Ansible', inventory: 'hosts', playbook: 'playbook.yml', sudoUser: null
+
+        }
+    }
+
     }
 }
