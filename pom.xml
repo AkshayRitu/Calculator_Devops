@@ -7,6 +7,8 @@
     <groupId>org.example</groupId>
     <artifactId>Calculator-Using-DevOps</artifactId>
     <version>1.0-SNAPSHOT</version>
+         
+         <!-- Demo on github -->
 
     <build>
         <plugins>
