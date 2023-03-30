@@ -16,7 +16,7 @@ public class Calculator {
         Scanner scanner = new Scanner(System.in);
         double d_number1, d_number2;
         int i_number1;
-
+        // THis is a comment
         // When the Docker container is started in the background via Ansible and you attach your terminal to it,
         // the initial application System.out.println statements are wiped out, to avoid that we use this stop-gap fix
         // Only enter the application once the user has pressed Enter key on the terminal.
